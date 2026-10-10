@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WordReference Client
 
-## Getting Started
+An unofficial dictionary and translation client that fetches WordReference results on the server and presents them in a Next.js interface.
 
-First, run the development server:
+## What it does
+
+- Choose a source and target dictionary and search for a term.
+- Get autocomplete suggestions while typing.
+- Display parsed translation results.
+- Save recent searches and adjust appearance preferences.
+
+## Run locally
+
+Use Node.js 20.9+ and Bun.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/SpyC0der77/wordreferenceclient.git
+cd wordreferenceclient
+bun install --frozen-lockfile
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Purpose |
+| --- | --- |
+| `bun run dev` | Start the development server |
+| `bun run build` | Build the production app |
+| `bun run start` | Serve a production build |
+| `bun run lint` | Run ESLint |
 
-## Learn More
+Run `build` before `start`.
 
-To learn more about Next.js, take a look at the following resources:
+## Dependencies and limitations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+No WordReference API key is used. The server fetches and parses WordReference HTML, so changes to the upstream markup or availability can affect results. This project is not affiliated with WordReference.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Source layout
 
-## Deploy on Vercel
+- [`components/search/search-app.tsx`](components/search/search-app.tsx): Search interface.
+- [`lib/wordreference/`](lib/wordreference/): Fetching and parsing dictionary results.
+- [`app/api/translate/route.ts`](app/api/translate/route.ts): Translation endpoint.
+- [`app/api/autocomplete/route.ts`](app/api/autocomplete/route.ts): Autocomplete endpoint.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Cloudflare deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The repo includes an OpenNext Worker and a Pages proxy. Authenticate Wrangler and configure your Cloudflare account before deployment.
+
+```bash
+bun run cf-typegen
+bun run deploy
+```
+
+`deploy` builds and deploys the `wordreference-app` Worker, then deploys the `wordreference` Pages project. The Pages `BACKEND` binding points to that Worker. Review [`wrangler.jsonc`](wrangler.jsonc), [`wrangler.pages.jsonc`](wrangler.pages.jsonc), and [`scripts/deploy-pages.mjs`](scripts/deploy-pages.mjs) before using these project names in another account.
